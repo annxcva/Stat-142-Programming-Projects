@@ -1,0 +1,123 @@
+---
+title: "Stat 142 MP Light 2"
+date: "1st Semester, A.Y. 2025-26"
+output: 
+  pdf_document:
+    latex_engine: xelatex
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+First Name: Anne Christine
+
+Last Name: Amores
+
+Student Number: 2021-04650
+
+Section: WFU
+
+\rule{\linewidth}{0.4pt}
+
+### Item 1
+
+Create a recursive function called `pois_recur(x, lambda)` that would compute $p(x)=P(X=x)$ where $X$ follows a Poisson distribution. The recursive formula is your hint, but take note how you'll define the base case.
+
+```{r}
+pois_recur <- function(x, lambda){
+  
+  # Description
+  # Computes the probability mass function (PMF) of the Poisson distrubution evaluated 
+  # at the mass point 'x', given 'lambda'
+  
+  # Parameters
+  # x -- mass point at which to evaluate the PMF, where x is a non-negative integer
+  # lambda -- rate parameter
+  
+  # Value
+  # P(X = x) = e^(-lambda) * lambda^x / x!
+  
+  if(x %% 1 != 0) {
+    return(0)
+  } else if (x == 0) {
+    return(exp(-lambda))
+  } else {
+    return(pois_recur(x - 1, lambda) * lambda / x)
+  }
+}
+```
+
+### Item 2
+
+Write a recursive function `pois_cdf_recur(x, lambda)` that returns $F(x)=P(X \leq x)$. This function should call the `pois_recur` function inside it whenever you need to compute for $p(x)$ (no need to use higher-order functions). Think carefully about the base case.
+
+```{r}
+pois_cdf_recur <- function(x, lambda){
+  
+  # Description
+  # Computes the CDF (cumulative distribution function) of the Poisson distrubution 
+  # evaluated at x, given lambda
+  
+  # Parameters
+  # x -- value at which to evaluate the CDF, where x is a non-negative integer
+  # lambda -- rate parameter
+  
+  # Value
+  # P(X <= x) = P(X = 0) + ... + P(X = x)
+  
+  if(x == 0) {
+    return(pois_recur(x, lambda))
+  } else {
+    return(pois_cdf_recur(x - 1, lambda) + pois_recur(x, lambda))
+  }
+}
+```
+
+### Item 3
+
+Compare your answer (for $p(x)$ and $F(x)$) to the built-in function in R corresponding to $P(X=x)$ for a Poisson distribution using the following values:
+
+a\. $\lambda=5$ and $x=5$
+
+```{r}
+# built-in function for P(X = x)
+dpois(x = 5, lambda = 5)
+
+# my function
+pois_recur(x = 5, lambda = 5)
+```
+
+The values returned by `dpois()` and `pois_recur()` for the given values of $\lambda$ and $x$ are equal. :D
+
+```{r}
+# built-in function for P(X <= x)
+ppois(q = 5, lambda = 5) # where q = x
+
+# my function
+pois_cdf_recur(x = 5, lambda = 5)
+```
+
+The values returned by `ppois()` and `pois_cdf_recur()` for the given values of $\lambda$ and $x$ are equal. :D
+
+b\. $\lambda=5$ and $x=3$
+
+```{r}
+# built-in function for P(X = x)
+dpois(x = 3, lambda = 5)
+
+# my function
+pois_recur(x = 3, lambda = 5)
+```
+
+The values returned by `dpois()` and `pois_recur()` for the given values of $\lambda$ and $x$ are equal. :D
+
+```{r}
+# built-in function for P(X <= x)
+ppois(q = 3, lambda = 5) # where q = x 
+
+# my function
+pois_cdf_recur(x = 3, lambda = 5)
+```
+
+The values returned by `ppois()` and `pois_cdf_recur()` for the given values of $\lambda$ and $x$ are equal. :D
