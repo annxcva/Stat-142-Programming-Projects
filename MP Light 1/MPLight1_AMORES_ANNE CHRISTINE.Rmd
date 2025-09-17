@@ -1,0 +1,168 @@
+---
+title: "Stat 142 MP Light 1"
+date: "1st Semester, A.Y. 2025-26"
+output:
+  pdf_document:
+    latex_engine: xelatex
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+############################################################# 
+
+**First Name**: Anne Christine
+
+**Last Name**: Amores
+
+**Student Number**: 2021-04650
+
+**Section**: WFU
+
+\rule{\linewidth}{0.4pt}
+
+### Item 1
+
+Write a general method function `taylor_swift` that would solve and return the answer computed from a specific Taylor Series expansion of a value $x$, given $n$, such that instead of summing up to infinity, you will only sum up to $n$. This function should accept at least three arguments, namely `x`, `n`, and a function named `func`. You may add more arguments as necessary.
+
+```{r}
+taylor_swift <- function(x, n, func){
+  
+  # Description
+  # Computes the Taylor series expansion of a function of interest evaluated at x 
+  
+  # Parameters
+  # x -- value at which to evaluate the approximation
+  # n -- number of terms in the expansion
+  # func -- a function that gives the expression being repeatedly summed in the expansion
+  
+  # Value
+  # Returns the approximate numeric value of the function of interest evaluated at x 
+  
+  sum <- 0 # sum will store the running total of the series
+  j <- 0 # j will cycle from 0 to n (the index of the summation)
+  while (j <= n) {
+    sum <- sum + func(x,j)
+    j <- j + 1
+  }
+  return(sum)
+}
+```
+
+### Item 2
+
+Write a function named `geom` such that when you use it as an argument to `taylor_swift`, it will return the convergence of the Taylor Series expansion of $\frac{1}{1-x}$up to $n$. Recall that
+
+$$
+\frac{1}{1-x} = \sum_{j=0}^{\infty}x^j, \text{ for} -1<x<1 
+$$
+
+```{r}
+geom <- function(x, j){
+  
+  # Description
+  # Computes the j^th term of the Taylor Series expansion of a geometric series
+  
+  # Parameters
+  # x -- value at which to evaluate the series
+  # j -- index of the term in the series
+  
+  # Value
+  # Returns the numeric value the j^th term 
+  
+   return(x^j)
+}
+```
+
+### Item 3
+
+Write a function named `expo` such that when you use it as an argument to `taylor_swift`, it will return the convergence of the Taylor Series expansion of $e^x$ up to $n$. Recall that
+
+$$
+e^x = \sum_{j=0}^{\infty}\frac{x^j}{j!}, \text{ for  } -\infty < x < \infty
+$$
+
+```{r}
+expo <- function(x, j){
+  
+  # Description
+  # Computes the j^th term of the Taylor Series expansion of e^x
+  
+  # Parameters
+  # x -- value at which to evaluate the series
+  # j -- index of the term in the series
+  
+  # Value
+  # Returns the numeric value of the j^th term
+  
+  return(x^j / factorial(j))
+}
+```
+
+### Item 4
+
+Create a control structure (not a function) that would perform the following:
+
+#### a.
+
+Check at which $n$ does `taylor_swift` approximate $\frac{1}{1-x}$ , with error less than `1e-3`,if `x=0.5`.
+
+```{r}
+true_geom <- 1 / (1 - 0.5) # true numeric value of 1/(1-x) evaluated at x = 0.5
+i = 0 # counter for the loop
+
+repeat {
+  if(abs(taylor_swift(x = 0.5, i, geom) - true_geom) < 1e-3){
+    cat("n >=", i)
+    break
+  } else{
+    i <- i + 1
+  }
+}
+```
+
+This means that using any $n \geq 10$ in `taylor_swift` will produce an approximation of $\frac{1}{1-x}$ with error less than $10^{-3}$.
+
+#### b.
+
+Check at which $n$ does `taylor_swift` approximate $e^x$ , with error less than `1e-3`,if `x=1`.
+
+```{r}
+true_expo <- exp(1)  # true numeric value of e^x evaluated at x = 1
+i = 0 # counter for the loop
+
+repeat {
+  if(abs(taylor_swift(x = 1, i, expo) - true_expo) < 1e-3){
+    cat("n >=", i)
+    break
+  } else{
+    i <- i + 1
+  }
+}
+```
+
+This means that using any $n \geq 6$ in `taylor_swift` will produce an approximation of $e^x$ with error less than $10^{-3}$.
+
+To verify 3b, let us look at the actual values.
+
+```{r}
+cat("e =", exp(1), "\n")
+cat("Approximation of e =", taylor_swift(x=1, n=6, expo))
+```
+
+Clearly, the true value of $e$ and the approximation of $e$ produced by `taylor_swift` agree up to the third decimal, showing that the error is less than $10^{-3}$.
+
+### References
+
+GeeksforGeeks. (2025, July 23). *Program to Print a New Line in String.* <https://www.geeksforgeeks.org/r-language/r-program-to-print-a-new-line-in-string/>
+
+    – Used to fix presentation of results in Item 4b (for visual mode on R Markdown)
+
+Hartman, G., et al. (n.d). *8.8: Taylor Series*. LibreTexts. [https://math.libretexts.org/Bookshelves/Calculus/Calculus_3e\_(Apex)/08%3A_Sequences_and_series/8.08%3A_Taylor_Series](https://math.libretexts.org/Bookshelves/Calculus/Calculus_3e_(Apex)/08%3A_Sequences_and_series/8.08%3A_Taylor_Series)
+
+    – Used to verify formula for Taylor Series expansion of $e^x$
+
+OpenAI. (2025, September 1). *ChatGPT (GPT-5) [Large language model]*. <https://chatgpt.com/share/68b52f95-5a6c-8004-81be-a283794f28b9>
+
+    – Used to fix presentation of entire document in PDF output (font, divider, indentation)
