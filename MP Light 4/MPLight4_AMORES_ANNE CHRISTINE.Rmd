@@ -1,0 +1,151 @@
+---
+title: "Stat 142 MP Light 4"
+output:
+  pdf_document: default
+  html_document: default
+date: "1st Semester, A.Y. 2025-26"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+**First Name**: Anne Christine
+
+**Last Name**: Amores
+
+**Student Number**: 2021-04650
+
+**Section**: WFU
+
+\rule{\linewidth}{0.4pt}
+
+```{r}
+# Import Twitter dataset
+twt_data <- read.csv("Twitter_Data.csv")
+
+# Set up connection
+library(RSQLite)
+library(DBI)
+con <- dbConnect(RSQLite::SQLite(), ":memory:")
+dbWriteTable(con, "twt_data", twt_data)
+```
+
+### Item 1
+
+Query the twitter dataset such that you will be able to extract rows from male users aged 45 and below. Retain only the replies, retweets, likes, and the twitter ID. Save this as a data frame named `twt_sub1` and write this in your database (i.e., in memory). Answer the following questions by querying from `twt_sub1` and by displaying the specific answer only via SQL queries.
+
+```{sql connection = con, output.var = "twt_sub1"}
+
+SELECT twitter_id, replies, retweets, likes
+  FROM twt_data
+  WHERE (gender = "Male" AND age <= 45)
+```
+
+```{r}
+dbWriteTable(con, "twt_sub1", twt_sub1)
+```
+
+a.  How many in total are the observations extracted from item 1?
+
+```{sql connection = con}
+SELECT COUNT () AS n_observations
+  FROM twt_sub1
+```
+
+\newpage
+
+b.  How many observations are extracted per user? Show the number of observations and the user.
+
+```{sql connection = con}
+
+SELECT COUNT () AS n_observations, twitter_id
+  FROM twt_sub1
+  GROUP BY twitter_id
+```
+
+c.  What is the average number of retweets, likes, and replies per user? Make sure to get the average of each variable and show each user (this should be in a single SQL query only).
+
+```{sql connection = con}
+
+SELECT twitter_id, AVG(retweets), AVG(likes), AVG(replies)
+  FROM twt_sub1
+  GROUP BY twitter_id
+```
+
+d.  Who is the user with the most likes? Show the number of likes and the user.
+
+```{sql connection = con}
+
+SELECT twitter_id, SUM(likes) AS total_likes
+  FROM twt_sub1
+  GROUP BY twitter_id 
+  ORDER BY total_likes DESC
+  LIMIT 1
+```
+
+\newpage
+
+### Item 2
+
+Query the twitter dataset such that you will be able to extract rows from female users aged 50 and above. Retain only the text, party, and the twitter ID. Save this as a data frame named `twt_sub2` and write this in your current database (i.e., in memory). Answer the following questions by querying from `twt_sub2` and by displaying the specific answer only via SQL queries.
+
+```{sql connection = con, output.var = "twt_sub2"}
+
+SELECT twitter_id, text, party
+  FROM twt_data
+  WHERE (gender = "Female" AND age >= 50)
+```
+
+```{r}
+dbWriteTable(con, "twt_sub2", twt_sub2)
+```
+
+a.  How many of the tweets (`text` column) in `twt_sub2` has the word "job" in it?
+
+```{sql connection = con}
+SELECT COUNT() AS n_tweets
+  FROM twt_sub2
+  WHERE text LIKE '%job%'
+```
+
+b.  Who is the user who mentioned the word "job" more than the others? Show the number and the user.
+
+```{sql connection = con}
+SELECT twitter_id, COUNT() AS n_job_mentions
+  FROM twt_sub2
+  WHERE text LIKE '%job%'
+  GROUP BY twitter_id 
+  ORDER BY n_job_mentions DESC
+  LIMIT 1
+```
+
+### Item 3
+
+Query the twitter dataset such that you will be able to extract the variables for twitter ID, from_user, and from_content. Save this as a data frame named `twt_sub3` and write this in your database (i.e., in memory). Answer the following questions by querying from `twt_sub3` and by displaying the specific answer only via SQL queries.
+
+```{sql connection = con, output.var = "twt_sub3"}
+
+SELECT twitter_id, from_user, from_content
+  FROM twt_data
+```
+
+```{r}
+dbWriteTable(con, "twt_sub3", twt_sub3)
+```
+
+a.  How many observations have content from the variable from_user (hint: explore the data to understand what it means to 'have content' and 'not have content' from the variable from_user)?
+
+```{sql connection = con}
+SELECT COUNT() AS n_observations
+  FROM twt_sub3
+  WHERE from_user != "None"
+```
+
+b.  How many observations have content from the variable from_content (same hint as item b)?
+
+```{sql connection = con}
+SELECT COUNT() AS n_observations
+  FROM twt_sub3
+  WHERE from_content != "None"
+```
