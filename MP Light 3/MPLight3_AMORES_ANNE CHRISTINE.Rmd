@@ -1,0 +1,114 @@
+---
+title: "Stat 142 MP Light 3"
+date: "1st Semester, A.Y. 2025-26"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(bench)
+```
+
+**First Name**: Anne Christine
+
+**Last Name**: Amores
+
+**Student Number**: 2021-04650
+
+**Section**: WFU
+
+\rule{\linewidth}{0.4pt}
+
+## Measuring and Optimizing Program Performance
+
+```{r}
+data("iris")  # Load iris data 
+
+# Original function
+get_means_iris <- function(specie, type){
+  length_1 <- c()
+  length_2 <- c()
+  width_1 <- c()
+  width_2 <- c()
+  average_length <- c()
+  average_width <- c()
+  
+  new_data <- iris[iris$Species == specie,]
+  for (i in 1:nrow(new_data)){
+    length_1 <- c(length_1, new_data[i, "Sepal.Length"])
+    length_2 <- c(length_2, new_data[i, "Petal.Length"])
+    width_1 <- c(width_1, new_data[i, "Sepal.Width"])
+    width_2 <- c(width_2, new_data[i, "Petal.Width"])
+  }
+  
+  average_final <- c()
+  if (type == "length"){
+    for (i in 1:nrow(new_data)){
+      average_final <- c(average_final, (length_1[i] + length_2[i])/2)
+    }
+  } else {
+    for (i in 1:nrow(new_data)) {
+      average_final <- c(average_final, (width_1[i] + width_2[i])/2)
+    }
+  }
+  
+  return(average_final)
+}
+```
+
+```{r}
+data("iris")  # Load iris data 
+
+# New function
+get_means_faster <-  function(specie, type){
+  
+  # Description
+  # Computes the average of sepal and petal lengths (if type = "length") or widths
+  # (if type = "width")
+  
+  # Parameters
+  # specie -- species of iris; must be one of "setosa", "versicolor", or "virginica"
+  # type -- measurement type; must be either "length" or "width"
+  
+  # Value
+  # Returns a numeric vector where the i^th element is the average of the i^th sepal and 
+  # petal measurement (length or width, depending on 'type' argument)
+
+  new_data <- iris[iris$Species == specie,]
+  
+  if (type == "length"){
+      length_1 <- new_data$Sepal.Length
+      length_2 <- new_data$Petal.Length
+      average <- (length_1 + length_2)/2
+  } else {
+      width_1 <- new_data$Sepal.Width
+      width_2 <- new_data$Petal.Width
+      average <- (width_1 + width_2)/2
+    }
+  
+  return(average)
+}
+```
+
+```{r}
+# Benchmarking
+
+test_bench <- bench::mark(get_means_iris("versicolor", "length"), 
+                          get_means_faster("versicolor", "length"), 
+                          iterations = 1000, 
+                          time_unit = "ms")
+test_bench
+test_bench[1,"median"]/test_bench[2,"median"]
+```
+
+```{r}
+knitr::include_graphics("Benchmark.png")
+```
+
+```{r}
+#############################################################
+### RELATIVE PERFORMANCE: 28.1238
+#############################################################
+```
